@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
     private static final Logger logger = LogManager.getLogger(Main.class);
-    private static final String CONFIG_FILE = "data/config.properties";
     private static final String SHIPS_FILE = "data/ships.txt";
 
     public static void main(String[] args) {
@@ -22,15 +21,10 @@ public class Main {
 
         try {
             DataInitializer initializer = new DataInitializer();
-
-            Port port = initializer.initializePort(CONFIG_FILE);
-            List<Ship> ships = initializer.initializeShips(SHIPS_FILE, port);
-
+            List<Ship> ships = initializer.initializeShips(SHIPS_FILE);
+            Port port = Port.getInstance();
             ExecutorService executor = Executors.newFixedThreadPool(ships.size());
-
-            logger.info("Submitting all ship tasks...");
             ships.forEach(executor::submit);
-
             executor.shutdown();
             try {
                 if (!executor.awaitTermination(5, TimeUnit.MINUTES)) {

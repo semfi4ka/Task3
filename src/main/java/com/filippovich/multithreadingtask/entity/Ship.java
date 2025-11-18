@@ -1,9 +1,9 @@
 package com.filippovich.multithreadingtask.entity;
 
 import com.filippovich.multithreadingtask.state.ShipState;
+import com.filippovich.multithreadingtask.state.impl.DoneState;
 import com.filippovich.multithreadingtask.state.impl.NewState;
 import com.filippovich.multithreadingtask.util.IdGenerator;
-import com.filippovich.multithreadingtask.entity.ShipTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,8 +12,8 @@ public class Ship implements Runnable {
 
 
     private final int id;
-    private final Port port;
-    private Berth berth;
+    private final Port port;    // оставил ссылку на порт для лучшей читабельности кода в стейтах
+    private Berth berth;        // корабль хранит занимаемый причал чтобы знать какой причал освобождать в DoneState
     private ShipState state;
 
     private final int capacity;
@@ -35,7 +35,7 @@ public class Ship implements Runnable {
     public void run() {
         Thread.currentThread().setName("Ship-" + id);
         try {
-            while (!(state instanceof com.filippovich.multithreadingtask.state.impl.DoneState)) {
+            while (!(state instanceof DoneState)) {
                 state.doAction(this);
             }
             state.doAction(this);

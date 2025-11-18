@@ -8,21 +8,35 @@ import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Port {
+public final class Port {
     private static final Logger logger = LogManager.getLogger(Port.class);
-
-    private final Warehouse warehouse;
-    private final Queue<Berth> freeBerths;
-    private final ReentrantLock lock = new ReentrantLock(true);
-    private final Condition berthAvailable = lock.newCondition();
-
-    public Port(int berthCount, Warehouse warehouse) {
+    private static final int DEFAULT_BERTHS = 2;
+    private static final int DEFAULT_WAREHOUSE_CAPACITY = 1000;
+    private static final int DEFAULT_WAREHOUSE_INITIAL = 500;
+    private Port(int berthCount, Warehouse warehouse) {
         this.warehouse = warehouse;
         this.freeBerths = new ArrayDeque<>(berthCount);
         for (int i = 1; i <= berthCount; i++) {
             freeBerths.add(new Berth(i));
         }
+        logger.info("Port (Singleton) initialized with {} berths. Warehouse: {}/{}", berthCount, warehouse.getCurrentContainers(), DEFAULT_WAREHOUSE_CAPACITY);
     }
+
+    private static class PortHolder {
+        private static final Warehouse DEFAULT_WAREHOUSE =
+                new Warehouse(DEFAULT_WAREHOUSE_CAPACITY, DEFAULT_WAREHOUSE_INITIAL);
+
+        private static final Port INSTANCE =
+                new Port(DEFAULT_BERTHS, DEFAULT_WAREHOUSE);
+    }
+
+    public static Port getInstance() {
+        return PortHolder.INSTANCE;
+    }
+    private final Warehouse warehouse;
+    private final Queue<Berth> freeBerths;
+    private final ReentrantLock lock = new ReentrantLock(true);
+    private final Condition berthAvailable = lock.newCondition();
 
     public Warehouse getWarehouse() {
         return warehouse;

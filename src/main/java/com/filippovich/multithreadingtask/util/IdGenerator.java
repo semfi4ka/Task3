@@ -2,7 +2,7 @@ package com.filippovich.multithreadingtask.util;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public class IdGenerator {
+public final class IdGenerator {
     private static IdGenerator instance;
     private static final ReentrantLock instanceLock = new ReentrantLock();
 
